@@ -11,7 +11,7 @@
 
 
 <!-- Menu -->
-    <Menu />
+    <Menu v-if="store.get_token" />
 <!-- / Menu -->
 
     
@@ -28,7 +28,7 @@
 
 
 
-<nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar">
+<nav v-if="store.get_token" class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar">
   
 
   
@@ -162,7 +162,7 @@
           
 
 <!-- Footer -->
-<footer class="content-footer footer bg-footer-theme">
+<footer class="content-footer footer bg-footer-theme" v-if="store.get_token"> 
   <div class="container-xxl">
     <div class="footer-container d-flex align-items-center justify-content-between py-4 flex-md-row flex-column">
       <div class="text-body">
@@ -204,8 +204,12 @@
   
 </template>
 <script>
+import { useStore } from './Store/auth'
 export default {
-    
+    setup(){
+      const store = useStore();
+      return { store }
+    }
 }
 </script>
 <style lang="">

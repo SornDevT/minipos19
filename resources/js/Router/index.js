@@ -5,12 +5,24 @@ import Pos from "../Pages/Pos.vue";
 import Transection from "../Pages/Transection.vue";
 import Report from "../Pages/Report.vue";
 import NoPage from "../Pages/NoPage.vue";
+import Login from "../Pages/Login.vue";
+import Register from "../Pages/Register.vue";
 
 export const routes = [
     {
         name:"root",
         path:"/",
         redirect: "/store"
+    },
+    {
+        name: "login",
+        path: "/login",
+        component: Login
+    },
+    {
+        name: "register",
+        path: "/register",
+        component: Register
     },
     {
         name: "store",
