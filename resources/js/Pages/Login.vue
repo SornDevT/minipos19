@@ -47,8 +47,8 @@
             <div class="mb-6">
               <button class="btn btn-info d-grid w-100" :disabled="CheckBT" @click="Login()">ເຂົ້າສູ່ລະບົບ</button>
             </div>
-            <div class="alert alert-warning" v-if="text_error" role="alert">
-                  {{ text_error }}
+            <div class="alert alert-warning" v-if="text_error || check_email_text || check_password_text" role="alert">
+                  {{ text_error }} {{ check_email_text }} {{ check_password_text }}
                 </div>
 
           <p class="text-center">
@@ -74,15 +74,48 @@ export default {
         email:'',
         password:'',
         remember_me: false,
+        check_email_text:'',
+        check_password_text:'',
         text_error:''
       }
     },
     computed:{
         CheckBT(){
-            if(this.email != '' && this.password !=''){
-              return false;
+
+          const EmailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+          // ກວດ Email
+          if(this.email){ 
+            if(EmailRegex.test(this.email)){
+              this.check_email_text = '';
             } else {
+              this.check_email_text = 'ອີເມວລ໌ບໍ່ຖຶກຕ້ອງ';
+            }
+          } else {
+            this.check_email_text = '';
+          }
+
+          // ກວດ ລະຫັດຜ່ານ ໃຫ້ມີຢ່າງນ້ອຍ 4 ຕົວອັກສອນ
+          if(this.password){
+            if(this.password.length<=3){
+              this.check_password_text = 'ລະຫັດຜ່ານຕ້ອງຫຼາຍກ່ວາ 4 ຕົວອັກສອນ';
+            } else {
+              this.check_password_text = '';
+            }
+          } else {
+            this.check_password_text = '';
+          }
+
+            // if(this.email != '' && this.password !=''){
+            //   return false;
+            // } else {
+            //   return true;
+            // }
+
+             if(!EmailRegex.test(this.email) || this.password.length<=3){
               return true;
+            } else {
+              return false;
             }
         }
     },
