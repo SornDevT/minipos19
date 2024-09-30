@@ -11,7 +11,12 @@ use App\Http\Controllers\API\StoreController;
 
 Route::post('register',[UserController::class,'register']);
 Route::post('login',[UserController::class,'login']);
-Route::get('logout',[UserController::class,'logout']);
+// Route::get('logout',[UserController::class,'logout']);
+
+Route::group(["middleware"=>["auth:api"]],
+    function(){
+        Route::get('logout',[UserController::class,'logout']);
+    });
 
 // Route::group(["middleware"=>["auth:api"]],
 //     function(){
@@ -19,7 +24,18 @@ Route::get('logout',[UserController::class,'logout']);
 //     }
 // );
 
-Route::controller(StoreController::class)->group(
+// ບໍ່ມີການກວດຊອບ token
+// Route::controller(StoreController::class)->group(
+//     function(){
+//         Route::post('store/add','add');
+//     });
+
+// ມີການກວດຊອບ token 
+Route::group(["middleware"=>["auth:api"]],
     function(){
-        Route::post('store/add','add');
+        Route::get('store',[StoreController::class,'index']);
+        Route::get('store/edit/{id}',[StoreController::class,'edit']);
+        Route::post('store/add',[StoreController::class,'add']);
+        Route::post('store/update/{id}',[StoreController::class,'update']);
+        Route::delete('store/delete/{id}',[StoreController::class,'detele']);
     });

@@ -58,7 +58,7 @@ class UserController extends Controller
         ];
         
         if($request->login_remember_me == 'true'){
-            JWTAuth::factory()->setTTL(10080); // 60 = 1h
+            JWTAuth::factory()->setTTL(43200); // 60 = 1h, 1month
         } 
 
        

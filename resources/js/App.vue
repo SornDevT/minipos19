@@ -228,7 +228,20 @@ export default {
 
           }
         }).catch((error)=>{
+          console.log(error.response.status)
+          
+          if(error.response.status == 401){
 
+            // ເຄຼຍຂໍ້ມູນໃນ localstorage
+            localStorage.removeItem("web_token");
+            localStorage.removeItem("web_user");
+
+            // ເຄຼຍ Token ແລະ user ໃນ pinia
+            this.store.remove_token();
+            this.store.remove_user();
+
+            this.$router.push("/login");
+          }
         });
       }
     }
