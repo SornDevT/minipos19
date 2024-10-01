@@ -5,14 +5,22 @@
 
     <div v-if="ShowForm">
         {{FormStore}}
-        <div class="row">
-            <div class="col-md-4">Image</div>
-            <div class="col-md-8">
-
         <div class=" d-flex justify-content-end">
             <button type="button" class="btn rounded-pill btn-success me-2" :disabled="CheckForm" @click="SaveStore()" >ບັນທຶກ</button>
             <button type="button" class="btn rounded-pill btn-danger" @click="CancelStore()" >ຍົກເລີກ</button>
         </div>
+        <div class="row">
+            <div class="col-md-4 text-center">
+
+                <img :src="Image_preview" @click="$refs.img_store.click()" class=" cursor-pointer"  style=" width:70%; ">
+
+
+                <input type="file" ref="img_store" style=" display:none;" @change="onSelect($event)" >
+
+            </div>
+            <div class="col-md-8">
+
+      
 
         <div class="mb-2">
             <label  class="form-label fs-6">ຊື່ສິນຄ້າ:</label>
@@ -62,8 +70,8 @@
         <div class=" d-flex">
 
             <div class="input-group me-2">
-            <input type="text" class="form-control" placeholder="ຄົ້ນຫາ..." aria-label="Recipient's username" aria-describedby="button-addon2">
-            <button class="btn btn-primary px-2" type="button" id="button-addon2"><i class='bx bx-search-alt fs-5'></i></button>
+            <input type="text" class="form-control" placeholder="ຄົ້ນຫາ..." v-model="Search" @keyup.enter="GetStore(1)" aria-label="Recipient's username" aria-describedby="button-addon2">
+            <button class="btn btn-primary px-2" type="button" id="button-addon2" @click="GetStore(1)"><i class='bx bx-search-alt fs-5'></i></button>
             </div>
 
             <button type="button" class="btn rounded-pill btn-info" @click="AddStore()">ເພີ່ມໃໝ່</button>
@@ -74,8 +82,8 @@
       <table class="table table-bordered">
         <thead>
           <tr>
-            <th>ID</th>
-            <th>ຮູບ</th>
+            <th width="80">ID</th>
+            <th width="120">ຮູບ</th>
             <th>ຊື່ສິນຄ້າ</th>
             <th>ຈຳນວນ</th>
             <th>ລາຄາຊື້</th>
@@ -85,11 +93,15 @@
         <tbody>
           <tr v-for="item in StoreData.data" :key="item.id">
             <td>{{item.id}}</td>
-            <td></td>
+            <td> 
+                <img :src="url + '/assets/img/'+item.image" v-if="item.image" class="img-list-store shadow" >
+                <img :src="url + '/assets/img/no-img.jpg'" v-else class="img-list-store shadow" >
+            </td>
             <td>{{ item.name }}</td>
             <td>{{ item.qty }}</td>
             <td>{{ item.price_buy }}</td>
             <td>
+                <!-- <i class='bx bx-edit-alt fs-4 text-info cursor-pointer' @click="EditStore(item.id)" ></i>  | <i class='bx bx-message-square-x fs-4 text-danger cursor-pointer' @click="DelStore(item.id)"></i> -->
               <div class="dropdown">
                 <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="bx bx-dots-vertical-rounded"></i></button>
                 <div class="dropdown-menu">
@@ -103,6 +115,8 @@
           
         </tbody>
       </table>
+
+      <button @click="showAlert">Hello world</button>
 
       <Pagination :pagination="StoreData" :offset="4" @paginate="GetStore($event)" />
 
@@ -120,6 +134,8 @@ export default {
     },
     data() {
         return {
+            url: window.location.origin,
+            Image_preview: window.location.origin + '/assets/img/upload-img.png',
             ShowForm:false,
             FormType:true,
             EditID:'',
@@ -132,7 +148,8 @@ export default {
             },
             StoreData:[],
             PerPage:5,
-            Sort:"desc"
+            Sort:"desc",
+            Search:"",
         }
     },
     computed:{
@@ -145,6 +162,26 @@ export default {
         }
     },
     methods:{
+        showAlert() {
+      // Use sweetalert2
+      this.$swal({
+                                position: 'top-end',
+                                toast:true,
+                                title: 'aaaaaa',
+                                icon: "success",
+                                showConfirmButton:false,
+                                timer: 2500
+                            });
+    },
+    onSelect(event){
+        // console.log(event);
+            this.FormStore.image = event.target.files[0];
+            let reader = new FileReader();
+            reader.readAsDataURL(this.FormStore.image);
+            reader.addEventListener("load", function(){
+                this.Image_preview = reader.result
+            }.bind(this,false));
+    },
         ChangeSort(){
             if(this.Sort=='asc'){
                 this.Sort = 'desc';
@@ -156,6 +193,7 @@ export default {
         AddStore(){
             this.ShowForm = true;
             this.FormType = true;
+            this.Image_preview = window.location.origin + '/assets/img/upload-img.png';
         },
         CancelStore(){
             this.ShowForm = false;
@@ -167,6 +205,13 @@ export default {
 
             axios.get(`api/store/edit/${id}`,{ headers:{ Authorization: 'Bearer '+this.store.get_token } }).then((res)=>{
                 this.FormStore = res.data;
+
+                if(res.data.image){
+                    this.Image_preview = this.url + "/assets/img/" + res.data.image;
+                } else {
+                    this.Image_preview = this.url + '/assets/img/upload-img.png';
+                }
+
                 this.ShowForm = true;
             }).catch((error)=>{
                 console.log(error);
@@ -183,32 +228,68 @@ export default {
         },
         DelStore(id){
 
-                axios.delete(`api/store/delete/${id}`,{ headers:{ Authorization: 'Bearer '+this.store.get_token } }).then((res)=>{
 
-                    if(res.data.success){
-                        this.GetStore();
-                    } else {
+            this.$swal(
+                {
+                    title: "ທ່ານແນ່ໃຈບໍ່?",
+                    text: "ທີ່ຈະລຶບຂໍ້ມູນນີ້!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "ຕົກລົງ!",
+                    cancelButtonText:"ຍົກເລີກ"
+                    }).then((result) => {
+                    if (result.isConfirmed) {
 
+                        axios.delete(`api/store/delete/${id}`,{ headers:{ Authorization: 'Bearer '+this.store.get_token } }).then((res)=>{
+
+                            if(res.data.success){
+                                this.GetStore();
+                                this.$swal({
+                                    title: "ການລຶບຂໍ້ມູນ!",
+                                    text: res.data.message,
+                                    showConfirmButton:false,
+                                    icon: "success",
+                                    timer: 3500
+                                });
+
+                            } else {
+
+                            this.$swal({
+                                title: res.data.message,
+                                icon: "error",
+                                showConfirmButton:false,
+                                timer: 4500
+                            });
+
+                            }
+
+                        }).catch((error)=>{
+                            console.log(error);
+                            if(error.response.status == 401){
+                                // ເຄຼຍຂໍ້ມູນໃນ localstorage
+                                localStorage.removeItem("web_token");
+                                localStorage.removeItem("web_user");
+                                // ເຄຼຍ Token ແລະ user ໃນ pinia
+                                this.store.remove_token();
+                                this.store.remove_user();
+                                this.$router.push("/login");
+                                }
+                        });
+
+                                
+                            }
                     }
+            );
 
-                }).catch((error)=>{
-                    console.log(error);
-                    if(error.response.status == 401){
-                        // ເຄຼຍຂໍ້ມູນໃນ localstorage
-                        localStorage.removeItem("web_token");
-                        localStorage.removeItem("web_user");
-                        // ເຄຼຍ Token ແລະ user ໃນ pinia
-                        this.store.remove_token();
-                        this.store.remove_user();
-                        this.$router.push("/login");
-                        }
-                });
+                
         },
         SaveStore(){
             if(this.FormType){
                 // ເພີ່ມຂໍ້ມູນໃໝ່
 
-                axios.post('api/store/add',this.FormStore,{ headers:{ Authorization: 'Bearer '+this.store.get_token } }).then((res)=>{
+                axios.post('api/store/add',this.FormStore,{ headers:{ "Content-Type":"multipart/form-data", Authorization: 'Bearer '+this.store.get_token } }).then((res)=>{
 
                     if(res.data.success){
                         console.log(res);
@@ -223,8 +304,22 @@ export default {
 
                         this.GetStore();
 
-                    } else {
+                        this.$swal({
+                                position: 'top-end',
+                                toast:true,
+                                title: res.data.message,
+                                icon: "success",
+                                showConfirmButton:false,
+                                timer: 2500
+                            });
 
+                    } else {
+                        this.$swal({
+                                title: res.data.message,
+                                icon: "error",
+                                showConfirmButton:false,
+                                timer: 4500
+                            });
                     }
 
                 }).catch((error)=>{
@@ -243,7 +338,7 @@ export default {
 
             } else {
                 // ອັບເດດຂໍ້ມູນ
-                axios.post(`api/store/update/${this.EditID}`,this.FormStore,{ headers:{ Authorization: 'Bearer '+this.store.get_token } }).then((res)=>{
+                axios.post(`api/store/update/${this.EditID}`,this.FormStore,{ headers:{ "Content-Type":"multipart/form-data", Authorization: 'Bearer '+this.store.get_token } }).then((res)=>{
 
                     if(res.data.success){
                          // ເຄຍຂໍ້ມູນໃນ Form
@@ -256,8 +351,21 @@ export default {
                         this.ShowForm = false;
                         // ອັບເດດ ຕາຕະລາງ
                         this.GetStore();
+                        this.$swal({
+                                position: 'top-end',
+                                toast:true,
+                                title: res.data.message,
+                                icon: "success",
+                                showConfirmButton:false,
+                                timer: 2500
+                            });
                     } else {
-                        
+                        this.$swal({
+                                title: res.data.message,
+                                icon: "error",
+                                showConfirmButton:false,
+                                timer: 4500
+                            });
                     }
 
                 }).catch((error)=>{
@@ -276,7 +384,7 @@ export default {
             }
         },
         GetStore(page){
-            axios.get(`api/store?page=${page}&perpage=${this.PerPage}&sort=${this.Sort}`,{ headers:{ Authorization: 'Bearer '+this.store.get_token } }).then((res)=>{
+            axios.get(`api/store?page=${page}&perpage=${this.PerPage}&sort=${this.Sort}&search=${this.Search}`,{ headers:{ Authorization: 'Bearer '+this.store.get_token } }).then((res)=>{
 
                 this.StoreData = res.data;
 
@@ -300,9 +408,20 @@ export default {
     },
     created(){
         this.GetStore();
+    },
+    watch:{
+        Search(){
+            if(this.Search == ''){
+                this.GetStore()
+            }
+        }
     }
 }
 </script>
-<style lang="">
-    
+<style scoped>
+    .img-list-store{
+        width: 80px;
+        border-radius: 5px;
+        border: 2px #ffffff solid;
+    }
 </style>

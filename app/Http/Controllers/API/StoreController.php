@@ -16,8 +16,15 @@ class StoreController extends Controller
         // return $store;
         $PerPage = \Request::get("perpage");
         $Sort = \Request::get("sort");
+        $Search = \Request::get("search");
 
          $store = Store::orderBy("id",$Sort)
+         ->where(
+            function($query) use ($Search){
+                $query->where("name","LIKE","%{$Search}%")
+                ->orWhere("price_buy","LIKE","%{$Search}%");
+            }
+         )
          ->paginate($PerPage)
          ->toArray();
 
@@ -28,10 +35,25 @@ class StoreController extends Controller
     public function add(Request $request){
 
         try { // try ຄືສ່ວນ code ທີ່ເຮັດວຽກ
+
+            // ກຳນົດ path ເສັ້ນທາງອັບໂຫຼດຮູບ
+            $upload_path = "/assets/img"; 
+
+            if($request->file('image')){
+
+                // gen ຊື່ຮູບພາບໃໝ່
+                $new_name_img = time().".".$request->image->getClientOriginalExtension();
+
+                // ອັບໂຫຼດ
+                $request->image->move(public_path($upload_path),$new_name_img);
+
+            } else {
+                $new_name_img = '';
+            }
             
                 $store = new Store([
                     'name' => $request->name,
-                    'image' => '',
+                    'image' => $new_name_img,
                     'qty' => $request->qty,
                     'price_buy' => $request->price_buy,
                     'price_sell' => $request->price_sell,
