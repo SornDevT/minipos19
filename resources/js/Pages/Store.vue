@@ -10,8 +10,11 @@
             <button type="button" class="btn rounded-pill btn-danger" @click="CancelStore()" >ຍົກເລີກ</button>
         </div>
         <div class="row">
-            <div class="col-md-4 text-center">
-
+            <div class="col-md-4 text-center" style="position: relative;">
+                <button type="button" @click="RemoveBt()" v-if="FormStore.image" class="btn rounded-pill btn-icon btn-danger img_store">
+            
+                <i class='bx bx-x-circle fs-4'></i>
+              </button>
                 <img :src="Image_preview" @click="$refs.img_store.click()" class=" cursor-pointer"  style=" width:70%; ">
 
 
@@ -29,20 +32,20 @@
 
         <div class="mb-2">
             <label  class="form-label fs-6">ຈຳນວນ:</label>
-            <input type="text" class="form-control" v-model="FormStore.qty" placeholder="...." >
+            <cleave :options="options" class="form-control" v-model="FormStore.qty" placeholder="...." />
         </div>
 
         <div class="row mb-2">
             <div class="col-md-6">
                 <div>
                     <label  class="form-label fs-6">ລາຄາຊື້:</label>
-                    <input type="text" class="form-control" v-model="FormStore.price_buy" placeholder="...." >
+                    <cleave :options="options" class="form-control" v-model="FormStore.price_buy" placeholder="...." />
                 </div>
             </div>
             <div class="col-md-6">
                 <div>
                     <label  class="form-label fs-6">ລາຄາຂາຍ:</label>
-                    <input type="text" class="form-control" v-model="FormStore.price_sell" placeholder="...." >
+                    <cleave :options="options"  class="form-control" v-model="FormStore.price_sell" placeholder="...." />
                 </div>
             </div>
         </div>
@@ -86,8 +89,8 @@
             <th width="120">ຮູບ</th>
             <th>ຊື່ສິນຄ້າ</th>
             <th>ຈຳນວນ</th>
-            <th>ລາຄາຊື້</th>
-            <th>ຈັດການ</th>
+            <th class="text-center" width="150">ລາຄາຊື້</th>
+            <th class="text-center" width="80">ຈັດການ</th>
           </tr>
         </thead>
         <tbody>
@@ -99,8 +102,8 @@
             </td>
             <td>{{ item.name }}</td>
             <td>{{ item.qty }}</td>
-            <td>{{ item.price_buy }}</td>
-            <td>
+            <td class="text-end">{{ formatPrice(item.price_buy) }}</td>
+            <td class="text-center">
                 <!-- <i class='bx bx-edit-alt fs-4 text-info cursor-pointer' @click="EditStore(item.id)" ></i>  | <i class='bx bx-message-square-x fs-4 text-danger cursor-pointer' @click="DelStore(item.id)"></i> -->
               <div class="dropdown">
                 <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="bx bx-dots-vertical-rounded"></i></button>
@@ -150,6 +153,16 @@ export default {
             PerPage:5,
             Sort:"desc",
             Search:"",
+            options: {
+                  numeral: true,
+                  numeralPositiveOnly: true,
+                  noImmediatePrefix: true,
+                  rawValueTrimPrefix: true,
+                  numeralIntegerScale: 10,
+                  numeralDecimalScale: 2,
+                  numeralDecimalMark: '.',
+                  delimiter: ','
+                }
         }
     },
     computed:{
@@ -162,6 +175,10 @@ export default {
         }
     },
     methods:{
+        formatPrice(value) {
+            let val = (value / 1).toFixed(0).replace(",", ".");
+            return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        },
         showAlert() {
       // Use sweetalert2
       this.$swal({
@@ -173,6 +190,13 @@ export default {
                                 timer: 2500
                             });
     },
+    RemoveBt(){
+
+        this.Image_preview = window.location.origin + '/assets/img/upload-img.png'
+        this.FormStore.image = ''; 
+
+    },
+
     onSelect(event){
         // console.log(event);
             this.FormStore.image = event.target.files[0];
@@ -423,5 +447,10 @@ export default {
         width: 80px;
         border-radius: 5px;
         border: 2px #ffffff solid;
+    }
+    .img_store{
+        top: 10px;
+    position: absolute;
+    right: 0px;
     }
 </style>
