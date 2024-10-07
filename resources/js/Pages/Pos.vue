@@ -38,7 +38,7 @@
                             <label>ຊື່ລູກຄ້າ:</label>
                             <input type="text" v-model="customer_name" class="form-control mb-1" placeholder="...">
                             <label>ເບີໂທ:</label>
-                            <input type="text" v-model="customrt_trl" class=" form-control mb-1" placeholder="...">
+                            <input type="text" v-model="customer_tel" class=" form-control mb-1" placeholder="...">
                     </div>
                     <div class=" p-2 bg-info text-white">
                         ລາຍການສັ່ງຊື້
@@ -149,6 +149,7 @@
 
 </template>
 <script>
+import axios from 'axios';
 import { useStore } from '../Store/auth';
 
 export default {
@@ -192,6 +193,49 @@ export default {
         }
     },
     methods:{
+        async openLink(link){
+            const response = await fetch(`${link}`,{ headers:{ Authorization: 'Bearer '+ this.store.get_token}});
+            const html = await response.text();
+            const blob = new Blob([html],{ type: "text/html"});
+            const blobUrl = URL.createObjectURL(blob);
+            window.open(blobUrl, "_blank");
+        },
+        ConfirmPay(){
+
+            axios.post('/api/transection/add',{
+                customer_name: this.customer_name,
+                customer_tel: this.customer_tel,
+                listorder: this.ListOrder
+            },{ headers:{ Authorization: 'Bearer '+this.store.get_token } }).then((res)=>{
+                if(res.data.success){
+
+                    // ເຄີຍຂໍ້ມູນເກົ່າ
+                    this.customer_name='';
+                    this.customer_tel = '';
+                    this.CashAmount = 0;
+                    this.ListOrder = [];
+                    this.GetStore()
+
+                    $("#dialog_pay").modal("hide");
+
+                    if(res.data.bill_id){
+                        // window.open(window.location.origin+"/api/bills/print/"+res.data.bill_id, "_blank");
+
+                        this.openLink(window.location.origin+"/api/bills/print/"+res.data.bill_id);
+                    }
+
+l
+                } else {
+                    this.$swal({
+                                title: res.data.message,
+                                icon: "error",
+                                showConfirmButton:false,
+                                timer: 4500
+                            });
+                }
+            })
+
+        },
         AddNum(num){
             this.CashAmount = parseInt(this.CashAmount?this.CashAmount:0) + parseInt(num) // 1 + 2 = 3
 
