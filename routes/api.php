@@ -6,6 +6,7 @@ use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\StoreController;
 use App\Http\Controllers\API\TransectionController;
 use App\Http\Controllers\API\BillController;
+use App\Http\Controllers\API\ReportController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -25,6 +26,7 @@ Route::group(["middleware"=>["auth:api"]],
     // transection
 Route::group(["middleware"=>["auth:api"]],
     function(){
+        Route::post('transection',[TransectionController::class,'index']);
         Route::post('transection/add',[TransectionController::class,'add']);
     });
 
@@ -54,4 +56,10 @@ Route::group(["middleware"=>["auth:api"]],
         Route::post('store/add',[StoreController::class,'add']);
         Route::post('store/update/{id}',[StoreController::class,'update']);
         Route::delete('store/delete/{id}',[StoreController::class,'detele']);
+    });
+
+    Route::group(["middleware"=>["auth:api"]],
+    function(){
+        Route::post('report',[ReportController::class,'created_report']);
+        // Route::get('store/edit/{id}',[ReportController::class,'edit']);
     });
