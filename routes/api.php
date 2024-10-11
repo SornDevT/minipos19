@@ -61,5 +61,5 @@ Route::group(["middleware"=>["auth:api"]],
     Route::group(["middleware"=>["auth:api"]],
     function(){
         Route::post('report',[ReportController::class,'created_report']);
-        // Route::get('store/edit/{id}',[ReportController::class,'edit']);
+        Route::get('report/dashgrap',[ReportController::class,'dashgrap']);
     });

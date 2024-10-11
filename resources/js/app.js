@@ -18,6 +18,8 @@ import Cleave from 'vue-cleave-component';
 import { PerfectScrollbarPlugin } from 'vue3-perfect-scrollbar';
 import 'vue3-perfect-scrollbar/style.css';
 
+import DashGrap from './Components/DashGrap.vue';
+
 
 const app = createApp(App);
 app.use(pinia);
@@ -26,5 +28,6 @@ app.use(Cleave);
 app.use(PerfectScrollbarPlugin);
 app.component('Menu',Menu);
 app.component('Pagination',Pagination);
+app.component('DashGrap',DashGrap);
 app.use(VueSweetalert2);
 app.mount('#vue-app');

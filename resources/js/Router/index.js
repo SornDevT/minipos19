@@ -1,9 +1,9 @@
 import { createWebHistory, createRouter } from "vue-router";
 
-import Store from "../Pages/Store.vue";
-import Pos from "../Pages/Pos.vue";
-import Transection from "../Pages/Transection.vue";
-import Report from "../Pages/Report.vue";
+// import Store from "../Pages/Store.vue";
+// import Pos from "../Pages/Pos.vue";
+// import Transection from "../Pages/Transection.vue";
+// import Report from "../Pages/Report.vue";
 import NoPage from "../Pages/NoPage.vue";
 import Login from "../Pages/Login.vue";
 import Register from "../Pages/Register.vue";
@@ -54,7 +54,7 @@ export const routes = [
     {
         name: "store",
         path: "/store",
-        component: Store,
+        component: ()=> import('../Pages/Store.vue'),
         meta: {
             middleware: [authMiddleware]
         }
@@ -62,7 +62,7 @@ export const routes = [
     {
         name: "pos",
         path: "/pos",
-        component: Pos,
+        component: ()=> import('../Pages/Pos.vue'),
         meta: {
             middleware: [authMiddleware]
         }
@@ -70,7 +70,7 @@ export const routes = [
     {
         name: "transection",
         path: "/transection",
-        component: Transection,
+        component: ()=> import('../Pages/Transection.vue'),
         meta: {
             middleware: [authMiddleware]
         }
@@ -78,7 +78,7 @@ export const routes = [
     {
         name: "report",
         path: "/report",
-        component: Report,
+        component: ()=> import('../Pages/Report.vue'),
         meta: {
             middleware: [authMiddleware]
         }

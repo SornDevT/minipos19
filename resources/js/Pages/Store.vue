@@ -1,10 +1,11 @@
 <template lang="">
+    <DashGrap />
     <div class="card">
   <h5 class="card-header">ລາຍການ ສະຕ໋ອກສິນຄ້າ</h5>
   <div class="card-body">
 
     <div v-if="ShowForm">
-        {{FormStore}}
+        <!-- {{FormStore}} -->
         <div class=" d-flex justify-content-end">
             <button type="button" class="btn rounded-pill btn-success me-2" :disabled="CheckForm" @click="SaveStore()" >ບັນທຶກ</button>
             <button type="button" class="btn rounded-pill btn-danger" @click="CancelStore()" >ຍົກເລີກ</button>
